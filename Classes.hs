@@ -39,21 +39,26 @@ fancyTrue = Red == Red
 data Tree a = Empty | Branch a (Tree a) (Tree a)
 
 instance Eq a => Eq (Tree a) where
-  t1 == t2 = undefined
+  Empty == Empty = True
+  Branch k1 l1 r1 == Branch k2 l2 r2 =
+    k1 == k2 && l1 == l2 && r1 == r2
+  _ == _ = False
 
-tree1, tree2 :: Tree Int
+tree1, tree2, tree3 :: Tree Int
 tree1 = Branch 3 (Branch 2 Empty Empty) (Branch 1 Empty Empty)
 tree2 = Branch 3 Empty Empty
+tree3 = Branch 5 (Branch 2 Empty Empty) (Branch 1 Empty Empty)
 
 testTreeEq :: Test
 testTreeEq =
   TestList
     [ "tree1 == tree1" ~: tree1 == tree1 ~?= True,
       "tree1 /= tree2" ~: tree1 == tree2 ~?= False,
-      "tree1 /= Empty" ~: tree1 == Empty ~?= False
+      "tree1 /= Empty" ~: tree1 == Empty ~?= False,
+      "tree1 /= tree3" ~: tree1 == tree3 ~?= False
     ]
 
-lookup :: Eq a => a -> [(a, b)] -> Maybe b
+-- lookup :: Eq a => a -> [(a, b)] -> Maybe b
 lookup _ [] = Nothing
 lookup a ((a', b) : ps) =
   if a == a'
@@ -118,7 +123,7 @@ instance Functor Tree where
 data Two a = MkTwo a a deriving (Eq, Show, Read, Ord)
 
 instance Functor Two where
-  fmap = undefined
+  fmap f (MkTwo x1 x2) = MkTwo (f x1) (f x2)
 
 main :: IO ()
 main = do
